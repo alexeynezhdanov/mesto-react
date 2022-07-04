@@ -3,7 +3,7 @@ import avatar from './../images/avatar.jpg';
 import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
 import api from './../utils/Api';
-import Cards from './Cards';
+import Card from './Card';
 
 
 function Main(props) {
@@ -69,7 +69,7 @@ function Main(props) {
 
             <ImagePopup card={props.selectedCard} isOpenImagePopup={props.isOpenImagePopup === true ? 'popup_opened' : ''} onClose={props.onClosePopup} />
 
-            <Cards cards={cards} onCardClick={props.onOpenPopupImage} />
+            <Card cards={cards} onCardClick={props.onOpenPopupImage} />
         </main>
     );
 }

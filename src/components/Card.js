@@ -1,4 +1,4 @@
-function Cards(props) {
+function Card(props) {
     return (
         <ul className="elements">
         {props.cards.map((card, id) => (
@@ -22,4 +22,4 @@ function Cards(props) {
     );
   }
   
-  export default Cards;
+  export default Card;
