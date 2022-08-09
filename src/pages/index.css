@@ -35,9 +35,10 @@
 @import url(../blocks/elements/__element/elements__element.css);
 @import url(../blocks/elements/__likes/elements__likes.css);
 @import url(../blocks/elements/__like/elements__like.css);
-@import url(../blocks/elements/__like/_active/element__like_active.css);
+@import url(../blocks/elements/__like/_active/elements__like_active.css);
 @import url(../blocks/elements/__likes-sum/elements__likes-sum.css);
 @import url(../blocks/elements/__basket/elements__basket.css);
+@import url(../blocks/elements/__basket/_hidden/elements__basket_hidden.css);
 @import url(../blocks/elements/__caption/elements__caption.css);
 @import url(../blocks/elements/__photo/elements__photo.css);
 @import url(../blocks/elements/__place/elements__place.css);
