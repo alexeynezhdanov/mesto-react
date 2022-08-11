@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 import Header from './Header';
 import Main from './Main';
 import api from './../utils/Api';
@@ -8,19 +8,18 @@ import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ImagePopup from './ImagePopup';
-import { CurrentUserContext } from './../contexts/CurrentUserContext';
-import { CurrentCardsContext } from './../contexts/CurrentCardsContext';
+import {CurrentUserContext} from './../contexts/CurrentUserContext';
 
 function App() {
 
-  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [isEditProfilePopupOpen, setProfilePopupOpen] = React.useState(false);
-  const [isAllPlacePopupOpen, setAllPlacePopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState({});
-  const [isImagePopupOpen, setOpenPopup] = React.useState(false);
-  const [currentUser, setCurrentUser] = React.useState({});
-  const [currentCards, setCurrentCards] = React.useState([]);
-
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
+  const [isEditProfilePopupOpen, setProfilePopupOpen] = useState(false);
+  const [isAllPlacePopupOpen, setAllPlacePopupOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState({});
+  const [isImagePopupOpen, setOpenPopup] = useState(false);
+  const [currentUser, setCurrentUser] = useState({});
+  const [currentCards, setCurrentCards] = useState([]);
+  
   //Получение данных профиля
   useEffect(() => {
     api.getProfile()
@@ -30,7 +29,7 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
-  }, [])
+  }, []);
 
   //Получение данных массива карточек
   useEffect(() => {
@@ -41,31 +40,31 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
-  }, [])
+  }, []);
 
   function handleAvatarClick() {
     setIsEditAvatarPopupOpen(true);
-  }
+  };
 
   function handleProfileClick() {
     setProfilePopupOpen(true);
-  }
+  };
 
   function handleAddPlaceClick() {
     setAllPlacePopupOpen(true);
-  }
+  };
 
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setProfilePopupOpen(false);
     setAllPlacePopupOpen(false);
     setOpenPopup(false);
-  }
+  };
 
   function handleCardClick(card) {
     setSelectedCard(card);
     setOpenPopup(true);
-  }
+  };
 
   //Изменение профиля, отправка данных на сервер
   function handleUpdateUser(item) {
@@ -77,7 +76,7 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
-  }
+  };
 
   //Изменение аватара, отправка данных на сервер
   function handleUpdateAvatar(item) {
@@ -89,7 +88,7 @@ function App() {
       .catch((err) => {
         console.log(err);
       })
-  }
+  };
 
   //Ставим и получаем лайки на сервере
   function handleCardLike(card) {
@@ -130,9 +129,7 @@ function App() {
   };
 
   return (
-    <>
       <CurrentUserContext.Provider value={currentUser}>
-        <CurrentCardsContext.Provider value={currentCards}>
           <Header />
           <Main
             onEditAvatar={handleAvatarClick}
@@ -141,6 +138,7 @@ function App() {
             onOpenPopupImage={handleCardClick}
             onCardLike={handleCardLike}
             onCardDelete={handleCardDelete}
+            currentCards={currentCards}
           />
           <Footer />
 
@@ -172,9 +170,7 @@ function App() {
             card={selectedCard}
             isOpenImagePopup={isImagePopupOpen === true ? 'popup_opened' : ''}
             onClose={closeAllPopups} />
-        </CurrentCardsContext.Provider>
       </CurrentUserContext.Provider>
-    </>
   );
 }
 

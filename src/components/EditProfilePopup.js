@@ -1,21 +1,28 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import PopupWithForm from './PopupWithForm';
 import { CurrentUserContext } from './../contexts/CurrentUserContext';
 
 function EditProfilePopup(props) {
-    const currentUser = React.useContext(CurrentUserContext);
-    const [name, setName] = React.useState({});
-    const [description, setDescription] = React.useState({});
+    const currentUser = useContext(CurrentUserContext);
+    const [profileName, setProfileName] = useState('');
+    const [profileDescription, setProfileDescription] = useState('');
+
+    //Подстановка данных полученных с сервера в форму
+    useEffect(() => {
+        if (props.isOpen) {
+        setProfileName(currentUser.name);
+        setProfileDescription(currentUser.about);}
+    }, [currentUser, props.isOpen]);
 
     //Отправка данных в стейт name
     function handleName(e) {
-        setName(e.target.value);
-    }
+        setProfileName(e.target.value);
+    };
 
     //Отправка данных в стейт description
     function handleDescription(e) {
-        setDescription(e.target.value);
-    }
+        setProfileDescription(e.target.value);
+    };
 
     //Обработка формы
     function handleSubmit(e) {
@@ -24,20 +31,14 @@ function EditProfilePopup(props) {
 
         // Передаём значения управляемых компонентов во внешний обработчик
         props.onUpdateUser({
-            name: name,
-            about: description
+            name: profileName,
+            about: profileDescription
         });
-    }
-
-    //Подстановка данных полученых с сервера в форму
-    useEffect(() => {
-        setName(currentUser.name);
-        setDescription(currentUser.about);
-    }, [currentUser]);
+    };
 
     return (
         <PopupWithForm
-            isOpen={props.isOpen === true ? 'popup_opened' : ''}
+            isOpen={props.isOpen && 'popup_opened'}
             onSubmit={handleSubmit}
             name='profile-info'
             title='Редактировать профиль'
@@ -47,8 +48,9 @@ function EditProfilePopup(props) {
             <input
                 type="text"
                 className="popup__input"
-                id="textName" 
+                id="textName"
                 onChange={handleName}
+                value={profileName}
                 placeholder="Имя"
                 minLength="2"
                 maxLength="40"
@@ -63,6 +65,7 @@ function EditProfilePopup(props) {
                 className="popup__input"
                 id="aboutMe"
                 onChange={handleDescription}
+                value={profileDescription}
                 placeholder="О себе"
                 minLength="2"
                 maxLength="200"

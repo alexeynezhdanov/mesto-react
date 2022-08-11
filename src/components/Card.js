@@ -1,9 +1,9 @@
-import React from 'react';
-import { CurrentUserContext } from './../contexts/CurrentUserContext';
+import {useContext} from 'react';
+import {CurrentUserContext} from './../contexts/CurrentUserContext';
 
 function Card(props) {
 
-    const currentUser = React.useContext(CurrentUserContext);
+    const currentUser = useContext(CurrentUserContext);
     const isOwn = props.card.owner._id === currentUser._id;
     const cardDeleteButtonClassName = (
         `elements__basket ${isOwn ? 'elements__basket_visible' : 'elements__basket_hidden'}`
@@ -14,7 +14,7 @@ function Card(props) {
 
     // Создаём переменную, которую после зададим в `className` для кнопки лайка
     const cardLikeButtonClassName = (
-        `elements__like ${isLiked ? 'elements__like_active' : ''}`
+        `elements__like ${isLiked && 'elements__like_active'}`
     );
 
     function handleLikeClick() {
@@ -54,6 +54,6 @@ function Card(props) {
             </div>
         </>
     );
-}
+};
 
 export default Card;

@@ -1,13 +1,10 @@
-import React from 'react';
+import {useContext}  from 'react';
 import Card from './Card';
-import { CurrentUserContext } from './../contexts/CurrentUserContext';
-import { CurrentCardsContext } from './../contexts/CurrentCardsContext';
-
+import {CurrentUserContext} from './../contexts/CurrentUserContext';
 
 function Main(props) {
 
-    const currentUser = React.useContext(CurrentUserContext);
-    const currentCards = React.useContext(CurrentCardsContext);
+    const currentUser = useContext(CurrentUserContext);
 
     return (
         <main className="content">
@@ -28,8 +25,8 @@ function Main(props) {
             </section>
 
             <ul className="elements">
-                {currentCards.map((card, id) => (
-                    <li className="elements__element" key={id}>
+                {props.currentCards.map((card, card_id) => (
+                    <li className="elements__element" key={card_id}>
                         <Card
                             card={card}
                             onCardClick={props.onOpenPopupImage}
