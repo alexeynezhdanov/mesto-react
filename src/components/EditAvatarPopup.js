@@ -1,28 +1,21 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import PopupWithForm from './PopupWithForm';
 
 function EditAvatarPopup(props) {
 
-  const [avatar, setAvatar] = useState('');
-  // записываем объект, возвращаемый хуком, в переменную
-  const avatarRef = useRef();
+  const avatarRef = useRef('');
 
   //Чистим инпуты
   useEffect(() => {
-    setAvatar('');
+    avatarRef.current.value = '';
   }, [props.isOpen]);
-
-  //Отправка данных в стейт avatar
-  function handleAvatar(e) {
-    setAvatar(e.target.value);
-  };
 
   //Обработка формы
   function handleSubmit(e) {
     e.preventDefault();
 
     props.onUpdateAvatar({
-      link: avatarRef.current.name /* Значение инпута, полученное с помощью рефа */
+      link: avatarRef.current.value /* Значение инпута, полученное с помощью рефа */
     });
   };
 
@@ -39,10 +32,8 @@ function EditAvatarPopup(props) {
         type="url"
         className="popup__input"
         id="avatarLink"
-        onChange={handleAvatar}
         ref={avatarRef}
-        name={avatar}
-        value={avatar}
+        name={avatarRef.current.value}
         placeholder="Ссылка на картинку"
         required />
 

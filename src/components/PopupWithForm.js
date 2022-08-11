@@ -5,8 +5,7 @@ function PopupWithForm(props) {
         <form 
           name={`${props.name}`} 
           onSubmit={props.onSubmit} 
-          className="popup__form overlay" 
-          noValidate>
+          className="popup__form overlay">
           <h2 className="popup__title">
             {props.title}
           </h2>

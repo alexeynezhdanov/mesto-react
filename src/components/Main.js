@@ -25,8 +25,8 @@ function Main(props) {
             </section>
 
             <ul className="elements">
-                {props.currentCards.map((card, card_id) => (
-                    <li className="elements__element" key={card_id}>
+                {props.currentCards.map((card) => (
+                    <li className="elements__element" key={card._id}>
                         <Card
                             card={card}
                             onCardClick={props.onOpenPopupImage}
