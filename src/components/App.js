@@ -1,30 +1,41 @@
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import Header from './Header';
 import Main from './Main';
+import Login from './Login';
+import ProtectedRoute from './ProtectedRoute';
+import Register from './Register';
 import api from './../utils/Api';
+import auth from './../utils/Auth';
 import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
 import AddPlacePopup from './AddPlacePopup';
 import ImagePopup from './ImagePopup';
-import {CurrentUserContext} from './../contexts/CurrentUserContext';
+import { CurrentUserContext } from './../contexts/CurrentUserContext';
+import InfoTooltip from './InfoTooltip';
 
 function App() {
 
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isEditProfilePopupOpen, setProfilePopupOpen] = useState(false);
   const [isAllPlacePopupOpen, setAllPlacePopupOpen] = useState(false);
+  const [isStatusTooltipPopupOpen, setStatusTooltipPopupOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState({});
   const [isImagePopupOpen, setOpenPopup] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState({});
+  const [currentLogin, setCurrentLogin] = useState('');
   const [currentCards, setCurrentCards] = useState([]);
-  
+  const history = useHistory();
+
+
   //Получение данных профиля
   useEffect(() => {
     api.getProfile()
       .then((user) => {
-        setCurrentUser(user)
+        setCurrentUser(user);
       })
       .catch((err) => {
         console.log(err);
@@ -41,6 +52,23 @@ function App() {
         console.log(err);
       })
   }, []);
+
+  //Проверка токена и при его наличии авторизация и переход на главную
+  useEffect(() => {
+    const jwt = localStorage.getItem('token')
+    if (jwt) {
+      auth.authentication(jwt)
+        .then((res) => {
+          setLoggedIn(true);
+          setCurrentLogin(res.data.email);
+          history.push("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }, []);
+
 
   function handleAvatarClick() {
     setIsEditAvatarPopupOpen(true);
@@ -59,6 +87,7 @@ function App() {
     setProfilePopupOpen(false);
     setAllPlacePopupOpen(false);
     setOpenPopup(false);
+    setStatusTooltipPopupOpen(false);
   };
 
   function handleCardClick(card) {
@@ -128,49 +157,109 @@ function App() {
       })
   };
 
+  //Запрос на регистрацию
+  function onRegister(item) {
+    auth.register(item.password, item.email)
+      .then((res) => {
+        console.log(res)
+        setStatusTooltipPopupOpen('ok');
+        history.push("/sign-in");
+      })
+      .catch((err) => {
+        console.log(err);
+        setStatusTooltipPopupOpen('err');
+      })
+  };
+
+  //Запрос на авторизацию
+  function onLogin(item) {
+    auth.authorization(item.password, item.email)
+      .then((res) => {
+        localStorage.setItem('token', res.token);
+        setLoggedIn(true);
+        setCurrentLogin(item.email);
+        history.push("/");
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  };
+
+  //Запрос на выход с авторизации
+  function onSignOut() {
+    localStorage.removeItem('token');
+    setLoggedIn(false);
+    setCurrentLogin('');
+  }
+
   return (
-      <CurrentUserContext.Provider value={currentUser}>
-          <Header />
-          <Main
-            onEditAvatar={handleAvatarClick}
-            onEditProfile={handleProfileClick}
-            onEditAddPlaceClick={handleAddPlaceClick}
-            onOpenPopupImage={handleCardClick}
-            onCardLike={handleCardLike}
-            onCardDelete={handleCardDelete}
-            currentCards={currentCards}
-          />
-          <Footer />
+    <CurrentUserContext.Provider value={currentUser}>
 
-          <EditAvatarPopup
-            isOpen={isEditAvatarPopupOpen}
-            onClose={closeAllPopups}
-            onUpdateAvatar={handleUpdateAvatar} />
+      <Header />
 
-          <EditProfilePopup
-            isOpen={isEditProfilePopupOpen}
-            onClose={closeAllPopups}
-            onUpdateUser={handleUpdateUser} />
+      <Switch>
+        <ProtectedRoute exact path="/"
+          loggedIn={loggedIn}
+          component={Main}
+          onEditAvatar={handleAvatarClick}
+          onEditProfile={handleProfileClick}
+          onEditAddPlaceClick={handleAddPlaceClick}
+          onOpenPopupImage={handleCardClick}
+          onCardLike={handleCardLike}
+          onCardDelete={handleCardDelete}
+          currentCards={currentCards}
+          onSignOut={onSignOut}
+          currentLogin={currentLogin} >
+        </ProtectedRoute>
 
-          <AddPlacePopup
-            isOpen={isAllPlacePopupOpen}
-            onClose={closeAllPopups}
-            onAddPlace={handleAddCard} />
-
-          <PopupWithForm
-            isOpen='true'
-            name='confirm-deletion'
-            title='Вы уверены?'
-            onClose={closeAllPopups}
-            button='Да'
-            buttonStyle='popup__button-confirm-deletion'>
-          </PopupWithForm>
-
-          <ImagePopup
-            card={selectedCard}
-            isOpenImagePopup={isImagePopupOpen === true ? 'popup_opened' : ''}
+        <Route path="/sign-up">
+          <Register
+            signup={onRegister}
             onClose={closeAllPopups} />
-      </CurrentUserContext.Provider>
+        </Route>
+
+        <Route path="/sign-in">
+          <Login
+            signin={onLogin}
+            onClose={closeAllPopups} />
+        </Route>
+
+      </Switch>
+
+      <InfoTooltip
+        isOpen={isStatusTooltipPopupOpen}
+        onClose={closeAllPopups} />
+
+      <EditAvatarPopup
+        isOpen={isEditAvatarPopupOpen}
+        onClose={closeAllPopups}
+        onUpdateAvatar={handleUpdateAvatar} />
+
+      <EditProfilePopup
+        isOpen={isEditProfilePopupOpen}
+        onClose={closeAllPopups}
+        onUpdateUser={handleUpdateUser} />
+
+      <AddPlacePopup
+        isOpen={isAllPlacePopupOpen}
+        onClose={closeAllPopups}
+        onAddPlace={handleAddCard} />
+
+      <PopupWithForm
+        isOpen='true'
+        name='confirm-deletion'
+        title='Вы уверены?'
+        onClose={closeAllPopups}
+        button='Да'
+        buttonStyle='popup__button-confirm-deletion'>
+      </PopupWithForm>
+
+      <ImagePopup
+        card={selectedCard}
+        isOpenImagePopup={isImagePopupOpen === true ? 'popup_opened' : ''}
+        onClose={closeAllPopups} />
+      <Footer />
+    </CurrentUserContext.Provider >
   );
 }
 
